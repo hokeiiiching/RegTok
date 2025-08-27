@@ -1,0 +1,17 @@
+# Core libraries for LLM interaction and environment variables
+google-generativeai
+python-dotenv
+
+# LangChain libraries for RAG pipeline
+langchain
+langchain-community
+langchain-huggingface
+
+# For turning text into vector embeddings
+sentence-transformers
+
+# For the local vector database
+chromadb
+
+# For the web user interface (we'll use this on Day 2)
+streamlit
