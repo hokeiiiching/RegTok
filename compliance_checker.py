@@ -26,7 +26,7 @@ def get_llm_response(text_input: str) -> str:
 
         # Initialize the model
         # Using 'gemini-pro' as it is a powerful and versatile model
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.5-pro')
 
         # Generate content
         response = model.generate_content(text_input)
