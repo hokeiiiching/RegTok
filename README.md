@@ -1,8 +1,7 @@
 # RegTok
 
-![Hackathon](https://img.shields.io/badge/Hackathon-TikTok-blue)
-![Python](https://img.shields.io/badge/Language-Python-3776AB)
-![LLM](https://img.shields.io/badge/LLM-Google%20Gemini%20Pro-orange)
+![Hackathon](https://tiktoktechjam2025.devpost.com/)
+![LLM](https://aistudio.google.com/)
 
 **A prototype system that uses a Retrieval-Augmented Generation (RAG) LLM to automatically flag software features that require geo-specific legal compliance logic.**
 
