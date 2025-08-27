@@ -1,75 +1,146 @@
-GeoCompliance Guardian
-A prototype system that uses a Retrieval-Augmented Generation (RAG) LLM to automatically flag software features that require geo-specific legal compliance logic.
-This project was built for the TikTok Hackathon to address the challenge of scaling global feature rollouts while ensuring compliance with dozens of geographic regulations.
-🎥 Demo Video
-[Link to your 3-minute YouTube demo video will go here]
-⚖️ Problem Statement
-As TikTok operates globally, every product feature must dynamically satisfy dozens of geographic regulations. Manually tracking which features are impacted by which laws is a significant challenge, leading to potential legal exposure, reactive firefighting, and manual overhead. This project aims to build a prototype that utilizes LLM capabilities to flag features requiring geo-specific compliance logic, turning regulatory detection from a blind spot into a traceable, auditable output.
-✨ Our Solution
-GeoCompliance Guardian is a web application that uses a Retrieval-Augmented Generation (RAG) architecture. Instead of relying on a generic LLM's knowledge, the system first retrieves relevant, up-to-date information from a curated knowledge base of specific regulations (e.g., DSA, GDPR, US state laws). This context is then provided to the LLM along with the feature description, enabling it to make a highly accurate and reasoned determination.
-Key Features
-Intelligent Analysis: Analyzes feature descriptions to detect potential needs for geo-specific compliance logic.
-Structured Output: Provides a clear "Yes," "No," or "Uncertain" flag for each feature.
-Clear Reasoning: Explains why a feature was flagged, citing the retrieved legal context.
-Regulation Identification: Lists the potential regulations that may apply.
-Audit-Ready: The output provides a clear, traceable record for compliance audits.
-🛠️ Tech Stack
-Language: Python
-LLM: Google Gemini Pro via Google AI Studio API
-Core Framework: LangChain for RAG pipeline orchestration
-Frontend: Streamlit for the interactive web demo
-Vector Embeddings: sentence-transformers (all-MiniLM-L6-v2)
-Vector Database: ChromaDB for local, persistent storage
-🚀 How to Set Up and Run a Local Demo
-Follow these steps to get the GeoCompliance Guardian running on your local machine.
-Prerequisites
-Python 3.8+ installed
-Git installed
-Step 1: Clone the Repository
-Open your terminal and clone the public GitHub repository:
-code
-Bash
+# RegTok
+
+![Hackathon](https://img.shields.io/badge/Hackathon-TikTok-blue)
+![Python](https://img.shields.io/badge/Language-Python-3776AB)
+![LLM](https://img.shields.io/badge/LLM-Google%20Gemini%20Pro-orange)
+
+**A prototype system that uses a Retrieval-Augmented Generation (RAG) LLM to automatically flag software features that require geo-specific legal compliance logic.**
+
+[🎥 Demo Video](Your-YouTube-Link-Here)
+
+---
+
+## ⚖️ Problem Statement
+
+As TikTok operates globally, every product feature must dynamically satisfy dozens of geographic regulations. Manually tracking which features are impacted by which laws is a significant challenge, leading to:
+
+- Potential legal exposure
+- Reactive firefighting
+- Manual overhead in scaling feature rollouts
+
+**Goal:** Build a prototype system that utilizes LLM capabilities to flag features requiring geo-specific compliance logic, turning regulatory detection from a blind spot into a traceable, auditable output.
+
+---
+
+## ✨ Our Solution
+
+**GeoCompliance Guardian** is a web application that leverages a Retrieval-Augmented Generation (RAG) architecture:
+
+1. **Retrieval:** Retrieves relevant, up-to-date information from a curated knowledge base of specific regulations (e.g., DSA, GDPR, US state laws).
+2. **Reasoning:** Provides the retrieved context to an LLM along with the feature description.
+3. **Decision:** Produces accurate, reasoned outputs flagging compliance needs.
+
+---
+
+### Key Features
+
+- **Intelligent Analysis:** Detects potential geo-specific compliance requirements from feature descriptions.
+- **Structured Output:** Provides clear `"Yes"`, `"No"`, or `"Uncertain"` flags.
+- **Clear Reasoning:** Explains why a feature was flagged, citing retrieved legal context.
+- **Regulation Identification:** Lists potential regulations that may apply.
+- **Audit-Ready:** Generates traceable outputs suitable for compliance audits.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Language:** Python
+- **LLM:** Google Gemini Pro via Google AI Studio API
+- **Core Framework:** LangChain for RAG pipeline orchestration
+- **Frontend:** Streamlit for interactive web demo
+- **Vector Embeddings:** `sentence-transformers` (all-MiniLM-L6-v2)
+- **Vector Database:** ChromaDB for local, persistent storage
+
+---
+
+## 🏗️ System Architecture
+
+Below is a high-level view of the **RAG pipeline**:
+
+Feature Description (PRD/TRD)
+│
+▼
+Retrieval Module
+(Vector DB: ChromaDB)
+│
+▼
+LLM Reasoning
+(Google Gemini Pro API)
+│
+▼
+Structured Output:
+
+Flag: Yes / No / Uncertain
+
+Reasoning
+
+Related Regulations
+│
+▼
+Audit & CSV Logging
+
+![Pipeline Diagram Placeholder](https://via.placeholder.com/600x300?text=RAG+Pipeline+Diagram)
+
+---
+
+
+## 🚀 Setup & Local Demo
+
+Follow these steps to run GeoCompliance Guardian locally:
+
+### Prerequisites
+
+- Python 3.8+
+- Git
+
+### Step 1: Clone the Repository
+
+```bash
 git clone [Your-GitHub-Repo-Link-Here]
 cd geocompliance-guardian
-Step 2: Set Up the Python Virtual Environment
-Create and activate a virtual environment to manage project dependencies.
-On macOS / Linux:
-code
-Bash
+```
+### Step 2: Set Up Python Virtual Environment
+
+macOS / Linux:
+```bash
 python3 -m venv venv
 source venv/bin/activate
-```*   **On Windows:**
+```
+
+Windows:
 ```bash
 python -m venv venv
-.\venv\Scripts\activate
-Step 3: Install All Dependencies
-Install all the required libraries using the requirements.txt file.
-code
-Bash
+source venv/Scripts/activate 
+```
+### Step 3: Install dependencies
+```bash
 pip install -r requirements.txt
-Step 4: Add Your Google API Key
-The application requires a Google Gemini API key to function.
-Create a file named .env in the root of the project directory.
-Add your API key to this file in the following format:
-code
-Code
+```
+
+### Step 4: Add Your Google AI Studio API Key
+Create a `.env` file in the project root:
+```env
 GOOGLE_API_KEY="your_actual_api_key_here"
-IMPORTANT: The .gitignore file is configured to ignore .env, so your secret key will not be committed to Git.
-Step 5: Build the Knowledge Base Vector Store
-Before running the app, you need to process the legal documents in the knowledge_base folder and create the local vector database.
-Run the following script:
-code
-Bash
+```
+| Note: `.gitignore` is configured to ignore `.env` already to protect your secret key.
+
+### Step 5 (Optional): Building the Knowledge Base Vector Store
+Run this script whenever there is any chances or updates to the knowledge base files
+```bash
 python prepare_knowledge_base.py
-This will create a chroma_db_store directory in your project folder. You only need to run this script once, or whenever you update the files in the knowledge_base folder.
-Step 6: Run the Streamlit Application
-You are now ready to launch the web application!
-code
-Bash
+```
+
+### Step 6: Run the streamlit application
+```bash
 streamlit run app.py
-Your web browser should automatically open a new tab with the running application. If not, your terminal will provide a local URL (usually http://localhost:8501) that you can visit.
-📖 How to Use the App
-Once the app is running, you will see a text area.
-Paste a feature description into the text area (you can find examples in the data/test_dataset.csv file).
-Click the "Check Compliance" button.
-The system will process the request and display the results: the Flag, the Reasoning, and any Related Regulations.
+```
+Your browser should automatically open the app.
+
+## How to use the app
+
+1) Paste a feature description into the text area (examples in data/test_dataset.csv)
+2) Click <b>Check Compliance</b>
+3) The system outputs:
+   1) Flag: "Yes", "No" or "Uncertain"
+   2) Reasoning: Explanation of the decision
+   3) Related Regulations: Optional Regulations detected
