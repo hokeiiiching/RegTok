@@ -1,7 +1,8 @@
 # RegTok
 
-![Hackathon](https://tiktoktechjam2025.devpost.com/)
-![LLM](https://aistudio.google.com/)
+![Hackathon](https://img.shields.io/badge/Hackathon-TikTok-blue)
+![Python](https://img.shields.io/badge/Language-Python-3776AB)
+![LLM](https://img.shields.io/badge/LLM-Google%20Gemini%20Pro-orange)
 
 **A prototype system that uses a Retrieval-Augmented Generation (RAG) LLM to automatically flag software features that require geo-specific legal compliance logic.**
 
@@ -54,32 +55,35 @@ As TikTok operates globally, every product feature must dynamically satisfy doze
 
 ## 🏗️ System Architecture
 
-Below is a high-level view of the **RAG pipeline**:
-
-Feature Description (PRD/TRD)
-│
-▼
-Retrieval Module
-(Vector DB: ChromaDB)
-│
-▼
-LLM Reasoning
-(Google Gemini Pro API)
-│
-▼
-Structured Output:
-
-Flag: Yes / No / Uncertain
-
-Reasoning
-
-Related Regulations
-│
-▼
-Audit & CSV Logging
-
-![Pipeline Diagram Placeholder](https://via.placeholder.com/600x300?text=RAG+Pipeline+Diagram)
-
++---------------------+
+| Feature Description |
+| (PRD/TRD) |
++----------+----------+
+|
+v
++---------------------+
+| Retrieval Module |
+| (Vector DB: Chroma)|
++----------+----------+
+|
+v
++---------------------+
+| LLM Reasoning |
+| (Google Gemini Pro)|
++----------+----------+
+|
+v
++---------------------+
+| Structured Output |
+| - Flag: Yes/No/? |
+| - Reasoning |
+| - Related Regulations|
++----------+----------+
+|
+v
++---------------------+
+| Audit & CSV Logging|
++---------------------+
 ---
 
 
