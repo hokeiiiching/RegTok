@@ -2,7 +2,7 @@
 
 ![Hackathon](https://img.shields.io/badge/Hackathon-TikTok-blue)
 ![Python](https://img.shields.io/badge/Language-Python-3776AB)
-![LLM](https://img.shields.io/badge/LLM-Google%20Gemini%20Pro-orange)
+![LLM](https://img.shields.io/badge/LLM-Google%20Gemini%20Pro%202.5-orange)
 
 **A prototype system that uses a Retrieval-Augmented Generation (RAG) LLM to automatically flag software features that require geo-specific legal compliance logic.**
 
