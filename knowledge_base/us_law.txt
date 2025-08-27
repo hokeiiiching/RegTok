@@ -1,0 +1,50 @@
+US Law - NCMEC Reporting Requirements (28 U.S. Code § 2258A) (Simplified Summary)
+
+Plain-language summary:
+This U.S. law requires electronic communication service providers and remote computing service providers to report any suspected child sexual abuse material (CSAM) to the National Center for Missing & Exploited Children (NCMEC). It also sets procedures for reporting, safe handling of information, and ensures providers are protected from liability when reporting in good faith.
+
+Key Provisions:
+
+Section 1 - Mandatory Reporting:
+
+* Service providers must report any apparent violations of child pornography laws.
+* Reports are submitted to NCMEC’s CyberTipline.
+
+Section 2 - Contents of Report:
+
+* Reports must include information about the sender, recipient, date, and nature of the content.
+* Providers should submit as much identifying information as possible without violating privacy laws.
+
+Section 3 - Good Faith Requirement:
+
+* Providers are protected from civil liability if they report suspected child sexual exploitation in good faith.
+* Encourages prompt reporting without fear of legal repercussions.
+
+Section 4 - Preservation of Data:
+
+* Providers must preserve relevant records for a reasonable period to aid law enforcement investigations.
+* Only retain necessary data and follow privacy standards.
+
+Section 5 - Law Enforcement Coordination:
+
+* Reports are shared with law enforcement agencies as needed.
+* NCMEC may coordinate investigations and provide guidance to service providers.
+
+Section 6 - Voluntary Best Practices:
+
+* Providers are encouraged to implement internal reporting policies and employee training.
+* Use automated detection tools where appropriate to identify CSAM.
+
+Section 7 - Confidentiality and Data Security:
+
+* Providers must ensure submitted reports and data are handled securely.
+* Limit access to authorized personnel and follow federal privacy guidelines.
+
+Section 8 - Enforcement and Oversight:
+
+* The law allows federal oversight to ensure providers comply with reporting requirements.
+* Failure to report may result in civil penalties or other consequences.
+
+---
+
+This summary emphasizes the law’s focus on mandatory CSAM reporting to NCMEC, good faith protections, data preservation, law enforcement coordination, and secure handling of information.

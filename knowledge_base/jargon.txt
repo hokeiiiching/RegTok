@@ -1,0 +1,72 @@
+Glossary of Internal Terms for EU DSA Summary
+
+Codename 'Bluebird' = User profile customization feature that allows users to manage content recommendations.
+
+Codename 'Redflag' = The reporting mechanism for illegal content that users can trigger.
+
+Codename 'EagleEye' = Trusted flagger system that prioritizes reports from verified organizations.
+
+Codename 'Mirror' = Content moderation transparency reports that platforms publish.
+
+Codename 'Pathfinder' = Recommendation system transparency and user opt-out functionality.
+
+Codename 'Spotlight' = Advertising transparency system that clarifies ad targeting and sponsorship.
+
+
+Glossary of Internal Terms for California Protecting Our Kids from Social Media Addiction Act
+
+Codename 'Timekeeper' = Age-based time-limiting and usage tracking tools for minors.
+
+Codename 'ScrollStop' = Features that disable or limit addictive platform features like infinite scrolling and autoplay.
+
+Codename 'Guardian' = Parental control system that allows parents to manage account usage and content exposure.
+
+Codename 'BrightLine' = Transparency reports on platform design choices and algorithmic recommendations affecting minors.
+
+Codename 'HealthAlert' = Educational warnings and guidance about risks of excessive social media use for minors.
+
+Codename 'VerifyMe' = Age verification system to identify minors and enforce protective measures.
+
+Glossary of Internal Terms for Florida Online Protections for Minors (HB3)
+
+Codename 'Gatekeeper' = Age verification system to ensure minors cannot access adult content.
+
+Codename 'ParentalShield' = Parental consent and control tools for managing minor accounts, screen time, and content access.
+
+Codename 'LabelLight' = Content labeling and warning system that marks age-appropriate and harmful content.
+
+Codename 'GuidePath' = Algorithm transparency and opt-out options for minors regarding content recommendations.
+
+Codename 'RedAlert' = Reporting and moderation mechanism for harmful or illegal content targeting minors.
+
+Codename 'AdClear' = Advertising transparency and restrictions on age-inappropriate ads targeting minors.
+
+Glossary of Internal Terms for Utah Social Media Regulation Act
+
+Codename 'NightGuard' = Nighttime restriction system limiting minor account access during specified hours.
+
+Codename 'ConsentLock' = Parental consent mechanism required before minors can create accounts.
+
+Codename 'VerifyKid' = Age verification system ensuring users under 18 are identified correctly.
+
+Codename 'ParentView' = Parental control tools for monitoring activity, setting usage limits, and managing features.
+
+Codename 'AlgoClear' = Transparency system for recommendation algorithms, including opt-out options from profiling.
+
+Codename 'AdBlockerJunior' = Advertising restrictions and labeling system to prevent inappropriate ads targeting minors.
+
+Codename 'DataShield' = Policies and tools for protecting minor data, limiting sharing and requiring parental consent.
+
+Glossary of Internal Terms for US NCMEC Reporting Requirements (28 U.S. Code § 2258A)
+
+Codename 'CyberTip' = Reporting mechanism to NCMEC for suspected child sexual abuse material (CSAM).
+
+Codename 'GoodFaithShield' = Legal protection for service providers who report suspected CSAM in good faith.
+
+Codename 'DataVault' = Secure preservation of relevant records for law enforcement investigations.
+
+Codename 'LawConnect' = Coordination system with law enforcement agencies for CSAM investigations.
+
+Codename 'SafeScan' = Internal detection and automated tools used by providers to identify CSAM.
+
+Codename 'PrivacyGuard' = Protocols to ensure confidentiality and secure handling of submitted reports and data.

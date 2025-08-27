@@ -1,0 +1,34 @@
+EU Digital Services Act (DSA) - Simplified Summary
+
+Plain-language summary:
+The EU DSA requires platforms to provide users with clear information about why content is recommended to them and to offer options not based on profiling. It also has strict rules for removing illegal content, reporting measures, and ensuring transparency about platform operations.
+
+Relevant Articles:
+
+Article 12 - Terms and Conditions:
+Platforms must provide their terms and conditions in clear, understandable language. Users should easily understand the rules of using the service.
+
+Article 13 - Notice and Action Mechanisms:
+Platforms must allow users to report illegal content. They must act quickly to remove or disable access to such content and provide users with feedback about what action was taken.
+
+Article 14 - Trusted Flaggers:
+Platforms should give special attention to reports from trusted organizations that identify illegal content quickly and reliably.
+
+Article 15 - Obligations for Platforms in Moderating Content:
+Platforms must have clear procedures for content moderation. They should inform users why content is removed, give users a chance to appeal, and avoid using content moderation systems that are unfair or discriminatory.
+
+Article 22 - Transparency of Recommendation Systems:
+Platforms that recommend content must explain why users see specific content. Users should be able to opt-out of recommendations based on profiling.
+
+Article 24 - Advertising Transparency:
+Users must know when content is ads or sponsored and why they were targeted.
+
+Article 26 - Reporting Transparency:
+Very large platforms must publish regular reports on content moderation, complaints, and algorithmic recommendations, including information about illegal content removal.
+
+Article 27 - Risk Management for Very Large Platforms:
+Platforms must assess systemic risks from their services, including how their recommendation systems might spread illegal content or disinformation, and take steps to mitigate those risks.
+
+---
+
+This simplified version captures the key points about content moderation, user transparency, and recommender systems under the EU DSA.

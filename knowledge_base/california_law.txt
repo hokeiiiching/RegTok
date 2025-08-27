@@ -1,0 +1,52 @@
+California - Protecting Our Kids from Social Media Addiction Act (Simplified Summary)
+
+Plain-language summary:
+This California law aims to protect children and teens from social media addiction. Platforms must limit addictive features for users under 18, provide clear information about time spent, and offer options to avoid content algorithms designed to maximize engagement. The law also requires parental controls and transparency reports on platform design choices that affect minors.
+
+Key Provisions:
+
+Section 1 - Definitions:
+
+* "Minor" refers to any user under 18.
+* "Addictive features" include infinite scrolling, autoplay videos, and features designed to maximize time spent on the platform.
+
+Section 2 - Age Verification:
+Platforms must implement reasonable measures to identify minors and apply the rules protecting them.
+
+Section 3 - Limiting Addictive Features:
+
+* Platforms cannot use addictive features for minors.
+* Time-limiting tools should be available.
+* Autoplay videos, endless scroll, and push notifications must be disabled or optional for minors.
+
+Section 4 - Transparency and Reporting:
+
+* Platforms must publish reports on the features affecting minors.
+* Explain design choices, how algorithms recommend content, and how addictive features are used.
+
+Section 5 - Parental Controls:
+
+* Platforms must provide parents with tools to manage their child’s account and screen time.
+* Options for content filtering and engagement limits must be included.
+
+Section 6 - Education and Warnings:
+
+* Clear warnings about risks of excessive use must be presented.
+* Provide guidance on healthy usage habits.
+
+Section 7 - Enforcement:
+
+* Violations may result in penalties and civil actions.
+* State agencies may monitor compliance and issue fines if necessary.
+
+Section 8 - Data Privacy Considerations:
+
+* Any data collected for age verification or parental controls must comply with privacy laws.
+
+Section 9 - Collaboration:
+
+* Platforms must collaborate with child health experts to assess risks and update protective features accordingly.
+
+---
+
+This summary captures detailed provisions, focusing on protection mechanisms for minors, transparency, parental control, and enforcement under the California act.

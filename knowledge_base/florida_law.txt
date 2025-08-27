@@ -1,0 +1,55 @@
+Florida - Online Protections for Minors (HB3) (Simplified Summary)
+
+Plain-language summary:
+This Florida law focuses on protecting minors from harmful online content. Platforms must implement parental consent and control mechanisms, ensure transparency about content targeting and recommendations, and limit exposure to sexual or inappropriate material. Age verification, content labeling, and reporting mechanisms are required to safeguard children.
+
+Key Provisions:
+
+Section 1 - Definitions:
+
+* "Minor" refers to users under 18.
+* "Harmful content" includes sexually explicit, violent, or otherwise age-inappropriate material.
+
+Section 2 - Age Verification:
+
+* Platforms must use reasonable methods to verify the age of users.
+* Restrict minors from accessing content intended for adults.
+
+Section 3 - Parental Consent and Control:
+
+* Platforms must obtain parental consent for accounts of minors.
+* Provide parents with tools to manage account activity, screen time, and content access.
+
+Section 4 - Content Labeling and Warnings:
+
+* Platforms must label content clearly with age-appropriate ratings.
+* Include warnings for potentially harmful material.
+
+Section 5 - Recommendation and Algorithm Transparency:
+
+* Platforms must explain how content is recommended to minors.
+* Provide options for users to opt out of algorithmic content suggestions targeting minors.
+
+Section 6 - Reporting and Moderation:
+
+* Platforms must have clear mechanisms for reporting harmful content.
+* Remove illegal or inappropriate content promptly and notify the user or parent about actions taken.
+
+Section 7 - Advertising Transparency:
+
+* Ensure that ads targeting minors are clearly marked.
+* Restrict targeting of minors with age-inappropriate advertisements.
+
+Section 8 - Enforcement:
+
+* State agencies may enforce compliance.
+* Violations can lead to fines, penalties, or other civil actions.
+
+Section 9 - Collaboration and Review:
+
+* Platforms are encouraged to collaborate with child protection experts.
+* Periodically review and update policies to protect minors effectively.
+
+---
+
+This summary emphasizes the law’s focus on parental controls, age verification, content labeling, algorithm transparency, and enforcement measures for protecting minors online in Florida.
