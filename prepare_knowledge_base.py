@@ -88,6 +88,7 @@ def build_vector_store():
 
     print("\n--- Pipeline Complete ---")
     print(f"Your knowledge base is now ready in ChromaDB Cloud under the collection: '{COLLECTION_NAME}'")
+    client = chromadb.PersistentClient(path="D:/cs/Work/RegTok")
 
 
 if __name__ == "__main__":
