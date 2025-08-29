@@ -74,14 +74,15 @@ def check_feature(feature_description: str) -> dict:
         feature_description (str): The description of the product feature.
 
     Returns:
-        dict: A dictionary with 'flag', 'reasoning', and 'related_regulations'.
+        dict: A dictionary with 'flag', 'reasoning', 'related_regulations', and 'thought'.
     """
 
     if not gemini_client:
         return {
             "flag": "Error",
             "reasoning": "Gemini client could not be initialized. Check API key.",
-            "related_regulations": []
+            "related_regulations": [],
+            "thought": "Could not generate thoughts as the Gemini client failed to initialize."
         }
 
     # 1. Retrieve relevant context from the vector database
@@ -125,30 +126,50 @@ def check_feature(feature_description: str) -> dict:
 
     print("Step 2: Sending request to LLM for analysis...")
     try:
-        # For Gemini, combine system and user prompt for a single generate_content call
         full_prompt = f"{system_prompt}\n\n{user_prompt}"
         
         response = gemini_client.models.generate_content(
-            model="gemini-2.5-pro", # Make sure to specify the model here
-            contents=full_prompt,  # Pass the combined prompt string directly
+            model="gemini-2.5-pro",
+            contents=full_prompt,
             config=types.GenerateContentConfig(
                 temperature=0.1,
-                response_mime_type= "application/json"
+                response_mime_type="application/json",
+                thinking_config=types.ThinkingConfig(
+                    include_thoughts=True
+                )
             )
         )
         
-        # 3. Parse the response
-        result_json = response.text 
-        result_dict = json.loads(result_json)
+        # --- MODIFIED SECTION START ---
+
+        # 3. Parse the multi-part response
+        result_dict = {}
+        thought_text = ""
+
+        for part in response.candidates[0].content.parts:
+            if part.thought:
+                # Capture the thought process text
+                thought_text += part.text
+            else:
+                # This is the final answer (the JSON part)
+                result_json = part.text
+                result_dict = json.loads(result_json)
+
+        # Add the captured thoughts into the final dictionary
+        result_dict['thought'] = thought_text
+
         print("Step 3: Analysis complete.")
         return result_dict
+
+        # --- MODIFIED SECTION END ---
 
     except Exception as e:
         print(f"An error occurred during LLM analysis: {e}")
         return {
             "flag": "Error",
             "reasoning": f"An exception occurred during analysis: {e}",
-            "related_regulations": []
+            "related_regulations": [],
+            "thought": f"An error occurred, so no thought process could be generated: {e}"
         }
 
 
@@ -164,3 +185,4 @@ if __name__ == "__main__":
     print(f"🚩 Flag: {analysis_result.get('flag')}")
     print(f"🤔 Reasoning: {analysis_result.get('reasoning')}")
     print(f"📜 Related Regulations: {analysis_result.get('related_regulations')}")
+    print(f"🧠 Thoughts: {analysis_result.get('thought')}")

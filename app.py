@@ -1,5 +1,5 @@
 import streamlit as st
-from compliance_checker import check_feature # MODIFIED: Import from the new file
+from compliance_checker import check_feature # Import your updated backend logic
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -9,8 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Custom CSS for Styling ---
-# NOTE: Your original custom CSS is perfectly fine and requires no changes.
+# --- Custom CSS for Styling (No changes needed here) ---
 st.markdown("""
 <style>
     /* Main app background */
@@ -70,11 +69,9 @@ st.markdown("""
 
 # --- UI Layout ---
 
-# Title
 st.markdown('<h1 class="title">⚖️ RegTok</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Your Automated Geo-Compliance Guardian</p>', unsafe_allow_html=True)
-
-st.write("") # Spacer
+st.write("") 
 
 # Input Area
 feature_description = st.text_area(
@@ -88,16 +85,12 @@ col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
     check_button = st.button("Check Compliance", use_container_width=True)
 
-
-st.write("") # Spacer
-st.write("---") # Divider
+st.write("")
+st.write("---")
 
 # --- Logic and Output ---
-# NOTE: This entire logic block was already compatible with your new checker.
-# It correctly calls the function and handles the dictionary it returns.
 if check_button and feature_description:
     with st.spinner('Analyzing compliance requirements... This may take a moment.'):
-        # This function call correctly works with the compliance_checker.py file
         result = check_feature(feature_description)
     
     st.subheader("Analysis Result")
@@ -105,6 +98,8 @@ if check_button and feature_description:
     flag = result.get("flag", "Error")
     reasoning = result.get("reasoning", "No reasoning provided.")
     regulations = result.get("related_regulations", [])
+    # --- ADDITION: Get the thoughts from the result ---
+    thought = result.get("thought")
 
     # Determine card style and icon based on flag
     if flag == "Yes":
@@ -135,6 +130,11 @@ if check_button and feature_description:
     # Display related regulations if any
     if regulations:
         st.info(f"**Potential Related Regulations:** {', '.join(regulations)}")
+        
+    # --- ADDITION: Display the thoughts in a clickable expander box ---
+    if thought:
+        with st.expander("Click to see the AI's thought process"):
+            st.info(thought)
 
 elif check_button and not feature_description:
     st.warning("Please enter a feature description to analyze.")
