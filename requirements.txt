@@ -1,5 +1,6 @@
 # Core libraries for LLM interaction and environment variables
 google-generativeai
+google-genai
 python-dotenv
 
 # LangChain libraries for RAG pipeline
