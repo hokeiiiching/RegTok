@@ -154,25 +154,13 @@ with st.spinner("Loading history..."):
     log_df = fetch_all_logs()
 
     if not log_df.empty:
-        # Make the dataframe more human-readable
-        display_df = log_df.rename(columns={
-            'timestamp': 'Date & Time',
-            'feature_description': 'Feature Description',
-            'flag': 'Flag',
-            'reasoning': 'Reasoning',
-            'related_regulations': 'Related Regulations'
-        })
-        
         # Select the columns you want to show in the main view
         st.dataframe(
-            display_df[['Date & Time', 'Feature Description', 'Flag', 'Reasoning', 'Related Regulations']],
+            log_df,
             use_container_width=True,
             hide_index=True
         )
 
-        # Optionally, show the detailed 'thought_process' in an expander
-        with st.expander("Click here to see the full log with AI thought processes"):
-             st.dataframe(log_df, use_container_width=True, hide_index=True)
 
     else:
         st.info("The audit log is currently empty. Run an analysis to populate it.")
