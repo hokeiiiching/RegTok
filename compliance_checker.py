@@ -8,124 +8,113 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-# --- MODIFIED: Import the new example fetcher ---
 from database_utils import init_db, save_analysis, fetch_corrected_examples
 
-# Load environment variables from .env file
 load_dotenv()
 
-# --- Part 1: Retrieval ---
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
+# --- MODIFIED: The retriever now fetches metadata for citations ---
 def find_relevant_laws(feature_description: str, collection_name: str, n_results: int = 3) -> list:
     """
     Embeds a feature description and queries ChromaDB for relevant legal text chunks.
+    
+    Returns:
+        list: A list of tuples, where each tuple contains (document_text, metadata_dict).
     """
     try:
+        # (Connection logic is unchanged)
         print("Connecting to ChromaDB Cloud...")
         api_key = os.getenv("CHROMA_API_KEY")
         tenant = os.getenv("CHROMA_TENANT")
         database = os.getenv("CHROMA_DATABASE")
-
         if not all([api_key, tenant, database]):
-            raise ValueError("ChromaDB credentials not found in .env file.")
-
-        cloud_client = chromadb.CloudClient(
-            api_key=api_key,
-            tenant=tenant,
-            database=database
-        )
+            raise ValueError("ChromaDB credentials not found.")
+        cloud_client = chromadb.CloudClient(api_key=api_key, tenant=tenant, database=database)
         collection = cloud_client.get_collection(name=collection_name)
-    except (ValueError, Exception) as e:
+    except Exception as e:
         print(f"Error: {e}")
-        return None
+        return []
 
     query_embedding = embedding_model.encode(feature_description).tolist()
+    
     results = collection.query(
         query_embeddings=[query_embedding],
-        n_results=n_results
+        n_results=n_results,
+        include=['metadatas', 'documents'] # Explicitly include metadatas
     )
-    return results.get('documents', [[]])[0]
+    
+    # Combine the documents and metadatas into a list of tuples
+    docs = results.get('documents', [[]])[0]
+    metadatas = results.get('metadatas', [[]])[0]
+    
+    # Ensure we handle cases where one might be missing
+    return list(zip(docs, metadatas)) if docs and metadatas else []
 
-# --- Part 2: Synthesis ---
+# --- Synthesis Part (LLM and Prompting) ---
 try:
     gemini_client = genai.Client()
 except Exception as e:
     print(f"Error initializing Gemini client: {e}")
-    print("Please ensure your GOOGLE_API_KEY environment variable is set.")
     gemini_client = None
 
 def expand_query_from_file(user_query):
-    """Expands a user's query by replacing jargon from a local CSV file."""
-    file_path = "/Users/kc/Work/RegTok/Terminologies.csv" # <-- Replace with file path of excel
+    # (This function is unchanged)
+    file_path = "/Users/kc/Work/RegTok/Terminologies.csv"
     try:
-        if file_path.endswith('.csv'):
-            mapping_df = pd.read_csv(file_path)
-        elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
-            mapping_df = pd.read_excel(file_path)
-        else:
-            raise ValueError("Unsupported file type. Please use a .csv or .xlsx file.")
+        mapping_df = pd.read_csv(file_path) if file_path.endswith('.csv') else pd.read_excel(file_path)
     except FileNotFoundError:
         return user_query
-
     if 'term' not in mapping_df.columns or 'explanation' not in mapping_df.columns:
         return user_query
-        
     expanded_query = user_query.lower()
     for _, row in mapping_df.iterrows():
         pattern = r'\b' + re.escape(row['term'].lower()) + r'\b'
         expanded_query = re.sub(pattern, row['explanation'].lower(), expanded_query)
-    
-    print(f"Expanded Query: {expanded_query}")
     return expanded_query
 
 def check_feature(feature_description: str) -> dict:
-    """
-    Checks a feature for compliance using a RAG pipeline that is dynamically
-    improved with few-shot examples from human feedback.
-    """
     expanded_query = expand_query_from_file(feature_description)
     if not gemini_client:
-        return {
-            "flag": "Error",
-            "reasoning": "Gemini client could not be initialized. Check API key.",
-            "related_regulations": [], "thought": "", "expanded_query": expanded_query
-        }
+        return {"flag": "Error", "reasoning": "Gemini client not initialized.", "related_regulations": [], "citations": []}
 
-    # 1. Retrieve relevant context from the vector database
-    print("Step 1: Searching for relevant regulations in the knowledge base...")
-    relevant_chunks = find_relevant_laws(expanded_query, collection_name="regulatory_docs")
-    context = "\n\n---\n\n".join(relevant_chunks) if relevant_chunks else "No specific regulatory documents were found for context."
-
-    # --- NEW: Self-Evolving Agent Logic ---
-    # 2. Fetch "Golden Examples" from the database based on human corrections.
-    print("Step 2: Fetching human-corrected examples to improve accuracy...")
-    golden_examples = fetch_corrected_examples()
+    # 1. Retrieve relevant context with metadata
+    print("Step 1: Searching for relevant regulations and sources...")
+    relevant_chunks_with_meta = find_relevant_laws(expanded_query, collection_name="regulatory_docs")
     
+    # --- MODIFIED: Build a context string that includes the source for each chunk ---
+    context_parts = []
+    if relevant_chunks_with_meta:
+        for doc, meta in relevant_chunks_with_meta:
+            # Assuming the metadata contains a 'source' key. This is crucial.
+            source = meta.get('source', 'Unknown Source')
+            context_parts.append(f"Source Document: [{source}]\nContent: {doc}\n---")
+        context = "\n".join(context_parts)
+    else:
+        context = "No specific regulatory documents were found for context."
+
+    # 2. Fetch "Golden Examples" (unchanged)
+    print("Step 2: Fetching diverse, human-corrected examples...")
+    golden_examples = fetch_corrected_examples()
     examples_prompt_section = ""
     if golden_examples:
-        # Format the examples into a string to be injected into the prompt.
-        examples_str = "\n".join([
-            f"### Example:\nProduct Feature: \"{ex['feature']}\"\nCorrect Analysis:\n{ex['correct_analysis']}"
-            for ex in golden_examples
-        ])
-        examples_prompt_section = f"""
-Here are some examples of correct analyses based on past human feedback. Use these as a guide to ensure your analysis is accurate and follows the correct format.
-{examples_str}
----
-"""
-    # 3. Augment the system prompt with the golden examples.
+        examples_str = "\n".join([f"### Example:\nProduct Feature: \"{ex['feature']}\"\nCorrect Analysis:\n{ex['correct_analysis']}" for ex in golden_examples])
+        examples_prompt_section = f"Here are some high-quality examples of correct analyses:\n{examples_str}\n---"
+        
+    # --- MODIFIED SYSTEM PROMPT: Now requires a "citations" key in the JSON ---
     system_prompt = f"""
-You are an expert compliance officer for a tech company. Your task is to analyze a product feature description and determine if it requires geo-specific compliance logic.
+You are an expert compliance officer. Your task is to analyze a product feature and determine if it requires geo-specific logic, based on the provided legal texts.
 
 {examples_prompt_section}
 
-First, in your thought process, analyze the user's feature. Then, compare it to the examples provided. Explicitly state whether the user's feature is more similar to the 'Yes' or 'No' example and explain why. This comparison should directly influence your final reasoning.
+First, in your thought process, analyze the user's feature and compare it to the examples provided. 
+Then, review the "Relevant Legal Texts". Each text is tagged with a "Source Document".
 
-After your thought process, provide your final analysis as a structured JSON output with three keys:
+After your thought process, provide your final analysis as a structured JSON. The JSON must have four keys:
 1.  "flag": A single string ("Yes", "No", or "Uncertain").
-2.  "reasoning": A concise, one-sentence explanation for your flag.
-3.  "related_regulations": A list of strings of specific regulation names. If none are relevant, provide an empty list [].
+2.  "reasoning": A concise explanation for your flag. Your reasoning must mention the law that applies.
+3.  "related_regulations": A list of strings of specific regulation names (e.g., ["GDPR", "COPPA"]).
+4.  "citations": A list of strings containing the exact "Source Document" tags (e.g., ["GDPR Article 8", "Utah S.B. 152 Section 3a"]) you used to arrive at your conclusion. If no source was relevant, provide an empty list [].
 """
 
     user_prompt = f"""
@@ -138,18 +127,12 @@ After your thought process, provide your final analysis as a structured JSON out
 Provide your analysis in the required JSON format.
 """
 
-    print("Step 3: Sending enhanced prompt to LLM for analysis...")
+    print("Step 3: Sending enhanced prompt with citation requirement to LLM...")
     try:
         full_prompt = f"{system_prompt}\n\n{user_prompt}"
-        
         response = gemini_client.models.generate_content(
-            model="gemini-2.5-pro",
-            contents=full_prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.1,
-                response_mime_type="application/json",
-                thinking_config=types.ThinkingConfig(include_thoughts=True)
-            )
+            model="gemini-2.5-pro", contents=full_prompt,
+            config=types.GenerateContentConfig(temperature=0.1, response_mime_type="application/json", thinking_config=types.ThinkingConfig(include_thoughts=True))
         )
         
         result_dict, thought_text = {}, ""
@@ -161,16 +144,12 @@ Provide your analysis in the required JSON format.
 
         result_dict['thought'] = thought_text
         result_dict['expanded_query'] = expanded_query
-
-        print("Step 4: Analysis complete.")
+        print("Step 4: Analysis with citations complete.")
         return result_dict
 
     except Exception as e:
         print(f"An error occurred during LLM analysis: {e}")
-        return {
-            "flag": "Error", "reasoning": f"An exception occurred: {e}",
-            "related_regulations": [], "thought": "", "expanded_query": expanded_query
-        }
+        return {"flag": "Error", "reasoning": f"An exception occurred: {e}", "related_regulations": [], "citations": [], "expanded_query": expanded_query}
 
 if __name__ == "__main__":
     init_db()

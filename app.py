@@ -1,10 +1,9 @@
 import streamlit as st
 from compliance_checker import check_feature
-# --- MODIFIED: Import the new reset function ---
 from database_utils import init_db, save_analysis, fetch_all_logs, update_feedback, reset_database
 import time
 
-# --- Page Configuration (no changes) ---
+# --- Page Configuration ---
 st.set_page_config(
     page_title="RegTok - Automate Geo-Regulation with LLM",
     page_icon="⚖️",
@@ -12,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Session State and CSS (no changes) ---
+# --- Initialize Session State for HITL and Reset ---
 if 'last_result' not in st.session_state:
     st.session_state['last_result'] = None
 if 'last_analysis_id' not in st.session_state:
@@ -20,16 +19,56 @@ if 'last_analysis_id' not in st.session_state:
 if 'show_correction_form' not in st.session_state:
     st.session_state['show_correction_form'] = False
 
+# --- Custom CSS for Styling ---
 st.markdown("""
 <style>
-    /* (CSS is unchanged) */
-    .stApp { background-color: #0E1117; color: #FAFAFA; }
-    .title { font-family: 'monospace', sans-serif; color: #FF4B4B; text-align: center; padding: 20px; font-size: 3rem; font-weight: bold; }
-    .subtitle { text-align: center; color: #A0A0A0; margin-bottom: 30px; }
-    .stButton>button { border-radius: 20px; border: 2px solid #FF4B4B; color: #FF4B4B; background-color: transparent; padding: 10px 25px; font-weight: bold; transition: all 0.3s ease-in-out; }
-    .stButton>button:hover { background-color: #FF4B4B; color: white; border-color: #FF4B4B; }
-    .stTextArea textarea { background-color: #161a25; border-radius: 10px; }
-    .result-card { background-color: #161a25; padding: 25px; border-radius: 15px; border-left: 5px solid; margin-top: 20px; }
+    /* Main app background */
+    .stApp {
+        background-color: #0E1117;
+        color: #FAFAFA;
+    }
+    /* Title style */
+    .title {
+        font-family: 'monospace', sans-serif;
+        color: #FF4B4B; /* TikTok red */
+        text-align: center;
+        padding: 20px;
+        font-size: 3rem;
+        font-weight: bold;
+    }
+    /* Subtitle style */
+    .subtitle {
+        text-align: center;
+        color: #A0A0A0;
+        margin-bottom: 30px;
+    }
+    /* Button style */
+    .stButton>button {
+        border-radius: 20px;
+        border: 2px solid #FF4B4B;
+        color: #FF4B4B;
+        background-color: transparent;
+        padding: 10px 25px;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+    }
+    .stButton>button:hover {
+        background-color: #FF4B4B;
+        color: white;
+        border-color: #FF4B4B;
+    }
+    .stTextArea textarea {
+        background-color: #161a25;
+        border-radius: 10px;
+    }
+    /* Result card styling */
+    .result-card {
+        background-color: #161a25;
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 5px solid;
+        margin-top: 20px;
+    }
     .result-card-yes { border-color: #d9534f; }
     .result-card-no { border-color: #5cb85c; }
     .result-card-uncertain { border-color: #f0ad4e; }
@@ -37,13 +76,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- UI Layout (no changes until the audit log section) ---
+
+# --- UI Layout ---
+
 st.markdown('<h1 class="title">⚖️ RegTok</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Automate Geo-Regulation to save on your business overheads</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Specialized LLM capabilities to flag features that require geo-specific logic, reducing your business overheads</p>', unsafe_allow_html=True)
 st.write("") 
 
+# Initialize Database on first run
 init_db()
 
+# Input Area
 feature_description = st.text_area(
     "Enter the feature description, PRD, or technical document text here:",
     height=150,
@@ -54,16 +97,18 @@ col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
     if st.button("Check Compliance", use_container_width=True):
         if feature_description:
-            with st.spinner('Analyzing compliance requirements...'):
+            with st.spinner('Analyzing compliance and finding sources...'):
                 result = check_feature(feature_description)
                 log_id = save_analysis(result, feature_description)
+                # Store the result and ID in the session state to persist after rerun
                 st.session_state['last_result'] = result
                 st.session_state['last_analysis_id'] = log_id
                 st.session_state['show_correction_form'] = False
         else:
             st.warning("Please enter a feature description to analyze.")
 
-# --- Display Result and HITL (no changes) ---
+
+# --- Display Result and HITL Feedback Section ---
 if st.session_state['last_result']:
     result = st.session_state['last_result']
     st.subheader("Analysis Result")
@@ -73,6 +118,7 @@ if st.session_state['last_result']:
     regulations = result.get("related_regulations", [])
     thought = result.get("thought")
     expanded_query = result.get("expanded_query")
+    citations = result.get("citations", [])
 
     flag_map = {
         "Yes": {"class": "result-card-yes", "icon": "🚨", "text": "Compliance Logic Required"},
@@ -80,6 +126,7 @@ if st.session_state['last_result']:
         "Uncertain": {"class": "result-card-uncertain", "icon": "❓", "text": "Uncertain - Human Review Needed"},
         "Error": {"class": "result-card-error", "icon": "❌", "text": "Error During Analysis"}
     }
+    
     display_info = flag_map.get(flag, flag_map["Error"])
 
     st.markdown(f"""
@@ -89,8 +136,11 @@ if st.session_state['last_result']:
     </div>
     """, unsafe_allow_html=True)
 
+    if citations:
+        st.info(f"**🔗 Source Citations:** {', '.join(citations)}")
+
     if expanded_query and expanded_query.lower() != feature_description.lower():
-        st.info(f"**🤖 Expanded Query:** {expanded_query}")
+        st.info(f"**🤖 Expanded Query:** The initial query was expanded for better analysis:\n\n> {expanded_query}")
 
     if regulations:
         st.info(f"**📜 Potential Related Regulations:** {', '.join(regulations)}")
@@ -99,6 +149,7 @@ if st.session_state['last_result']:
         with st.expander("Click to see the AI's thought process"):
             st.info(thought)
 
+    # Human-in-the-Loop (HITL) Feedback UI
     st.write("---")
     st.markdown("#### Is this analysis correct?")
     
@@ -115,46 +166,53 @@ if st.session_state['last_result']:
         if st.button("✏️ Edit"):
             st.session_state['show_correction_form'] = True
 
+    # Correction Form
     if st.session_state.get('show_correction_form'):
         with st.form("correction_form"):
             st.warning("Please provide the correct analysis.")
-            corrected_flag = st.selectbox("Correct Flag:", options=["Yes", "No", "Uncertain"], index=["Yes", "No", "Uncertain"].index(flag) if flag in ["Yes", "No", "Uncertain"] else 0)
-            corrected_reasoning = st.text_area("Correct Reasoning:")
+            corrected_flag = st.selectbox(
+                "Correct Flag:",
+                options=["Yes", "No", "Uncertain"],
+                index=["Yes", "No", "Uncertain"].index(flag) if flag in ["Yes", "No", "Uncertain"] else 0
+            )
+            corrected_reasoning = st.text_area(
+                "Correct Reasoning:"
+            )
             
             submitted = st.form_submit_button("Submit Correction")
             if submitted:
-                update_feedback(st.session_state['last_analysis_id'], status='corrected', corrected_flag=corrected_flag, corrected_reasoning=corrected_reasoning)
+                update_feedback(
+                    st.session_state['last_analysis_id'],
+                    status='corrected',
+                    corrected_flag=corrected_flag,
+                    corrected_reasoning=corrected_reasoning
+                )
                 st.success("Thank you! Your correction has been saved.")
                 st.session_state['last_result'] = None
                 st.session_state['last_analysis_id'] = None
                 st.session_state['show_correction_form'] = False
                 st.rerun()
 
-# --- MODIFIED AUDIT LOG DISPLAY SECTION ---
+
+# --- Audit Log Display ---
 st.write("---")
 
-# Use columns to place the title and reset button on the same line
-col1, col2 = st.columns([3, 1])
-with col1:
+# Use columns for the title and reset button
+log_header_cols = st.columns([3, 1])
+with log_header_cols[0]:
     st.subheader("📜 Analysis History (Audit Log)")
-with col2:
+with log_header_cols[1]:
     if st.button("🗑️ Clear History", use_container_width=True):
-        # 1. Call the function to reset the database
         reset_database()
-        
-        # 2. Clear the current session memory to remove any displayed result card
+        # Clear session memory to remove the result card above
         st.session_state['last_result'] = None
         st.session_state['last_analysis_id'] = None
         st.session_state['show_correction_form'] = False
-        
-        # 3. Show a confirmation message
         st.success("Audit log and session memory cleared!")
-        
-        # 4. Pause briefly so the user can see the message, then rerun the app
-        time.sleep(1)
+        time.sleep(1) # Pause to let the user see the message
         st.rerun()
 
-# The rest of the log display logic is the same
+# Display the log table
 with st.spinner("Loading history..."):
     log_df = fetch_all_logs()
 
@@ -164,12 +222,17 @@ with st.spinner("Loading history..."):
             use_container_width=True,
             hide_index=True,
             column_config={
-                "timestamp": st.column_config.DatetimeColumn("Timestamp", format="YYYY-MM-DD HH:mm:ss"),
+                "timestamp": st.column_config.DatetimeColumn(
+                    "Timestamp",
+                    format="YYYY-MM-DD HH:mm:ss",
+                ),
                 "original_query": "Original Query",
                 "flag": "AI Flag",
                 "reasoning": "AI Reasoning",
                 "status": "Review Status",
-                "human_feedback": "Human Feedback"
+                "human_feedback": "Human Feedback",
+                "citations": "Source Citations",
+                "related_regulations": "Related Regulations"
             }
         )
     else:
