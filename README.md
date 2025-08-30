@@ -7,6 +7,9 @@ citations.
 
 🎥 Watch the Demo Video
 
+[![Watch the video](https://img.youtube.com/vi/Gez1QTcfmI0/0.jpg)](https://www.youtube.com/watch?v=Gez1QTcfmI0)
+
+
 # ⚖️ The Problem: Turning a Blind Spot into a Strength
 
 As a global platform like TikTok, every new product feature must
