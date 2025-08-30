@@ -1,16 +1,24 @@
 import streamlit as st
-from compliance_checker import check_feature # Import your updated backend logic
-from database_utils import init_db, save_analysis, fetch_all_logs
+from compliance_checker import check_feature
+from database_utils import init_db, save_analysis, fetch_all_logs, update_feedback
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="RegTok - Automate Geo-Regulation with LLM to reduce your business overheads",
+    page_title="RegTok - Automate Geo-Regulation with LLM",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- Custom CSS for Styling (No changes needed here) ---
+# --- Initialize Session State for HITL ---
+if 'last_result' not in st.session_state:
+    st.session_state['last_result'] = None
+if 'last_analysis_id' not in st.session_state:
+    st.session_state['last_analysis_id'] = None
+if 'show_correction_form' not in st.session_state:
+    st.session_state['show_correction_form'] = False
+
+# --- Custom CSS (no changes) ---
 st.markdown("""
 <style>
     /* Main app background */
@@ -69,84 +77,115 @@ st.markdown("""
 
 
 # --- UI Layout ---
-
 st.markdown('<h1 class="title">⚖️ RegTok</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Automate Geo-Regulation to save on your business overheads</p>', unsafe_allow_html=True)
 st.write("") 
+
+# Initialize Database
+init_db()
 
 # Input Area
 feature_description = st.text_area(
     "Enter the feature description, PRD, or technical document text here:",
     height=150,
-    placeholder="e.g., 'This feature reads user location to enforce France's copyright rules' or 'An age gate is required for users in Utah under 18.'"
+    placeholder="e.g., 'This feature uses a user's location to enforce France's copyright rules' or 'An age gate is required for users in Utah under 18.'"
 )
 
-# Button
 col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
-    check_button = st.button("Check Compliance", use_container_width=True)
+    if st.button("Check Compliance", use_container_width=True):
+        if feature_description:
+            with st.spinner('Analyzing compliance requirements... This may take a moment.'):
+                result = check_feature(feature_description)
+                log_id = save_analysis(result, feature_description)
+                st.session_state['last_result'] = result
+                st.session_state['last_analysis_id'] = log_id
+                st.session_state['show_correction_form'] = False
+        else:
+            st.warning("Please enter a feature description to analyze.")
 
-st.write("")
 
-# Create DB file on first run
-init_db()
-
-
-# --- Logic and Output ---
-if check_button and feature_description:
-    with st.spinner('Analyzing compliance requirements... This may take a moment.'):
-        result = check_feature(feature_description)
-        # Save result to DB right after getting it
-        if result:
-            save_analysis(result, feature_description)
-    
+# --- Display Result and HITL Feedback Section ---
+if st.session_state['last_result']:
+    result = st.session_state['last_result']
     st.subheader("Analysis Result")
 
     flag = result.get("flag", "Error")
     reasoning = result.get("reasoning", "No reasoning provided.")
     regulations = result.get("related_regulations", [])
-    # --- ADDITION: Get the thoughts from the result ---
     thought = result.get("thought")
+    expanded_query = result.get("expanded_query")
 
-    # Determine card style and icon based on flag
-    if flag == "Yes":
-        card_class = "result-card-yes"
-        icon = "🚨"
-        flag_text = "Compliance Logic Required"
-    elif flag == "No":
-        card_class = "result-card-no"
-        icon = "✅"
-        flag_text = "No Compliance Logic Required"
-    elif flag == "Uncertain":
-        card_class = "result-card-uncertain"
-        icon = "❓"
-        flag_text = "Uncertain - Human Review Needed"
-    else: # Error
-        card_class = "result-card-error"
-        icon = "❌"
-        flag_text = "Error During Analysis"
+    flag_map = {
+        "Yes": {"class": "result-card-yes", "icon": "🚨", "text": "Compliance Logic Required"},
+        "No": {"class": "result-card-no", "icon": "✅", "text": "No Compliance Logic Required"},
+        "Uncertain": {"class": "result-card-uncertain", "icon": "❓", "text": "Uncertain - Human Review Needed"},
+        "Error": {"class": "result-card-error", "icon": "❌", "text": "Error During Analysis"}
+    }
+    display_info = flag_map.get(flag, flag_map["Error"])
 
-    # Display the result in our custom styled card
     st.markdown(f"""
-    <div class="result-card {card_class}">
-        <h3 style="margin-bottom: 15px;">{icon} Flag: {flag_text}</h3>
+    <div class="result-card {display_info['class']}">
+        <h3 style="margin-bottom: 15px;">{display_info['icon']} Flag: {display_info['text']}</h3>
         <p><strong>Reasoning:</strong> {reasoning}</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Display related regulations if any
+    if expanded_query and expanded_query.lower() != feature_description.lower():
+        st.info(f"**🤖 Expanded Query:** The initial query was expanded for better analysis:\n\n> {expanded_query}")
+
     if regulations:
-        st.info(f"**Potential Related Regulations:** {', '.join(regulations)}")
+        st.info(f"**📜 Potential Related Regulations:** {', '.join(regulations)}")
         
-    # --- ADDITION: Display the thoughts in a clickable expander box ---
     if thought:
         with st.expander("Click to see the AI's thought process"):
             st.info(thought)
 
-elif check_button and not feature_description:
-    st.warning("Please enter a feature description to analyze.")
+    st.write("---")
+    st.markdown("#### Is this analysis correct?")
+    
+    feedback_cols = st.columns(8)
+    with feedback_cols[0]:
+        if st.button("✔️ Approve"):
+            update_feedback(st.session_state['last_analysis_id'], status='approved')
+            st.success("Feedback saved! Analysis has been approved.")
+            st.session_state['last_result'] = None
+            st.session_state['last_analysis_id'] = None
+            st.rerun()
 
-# --- ADDITION: Display the Audit Log at the bottom of the page ---
+    with feedback_cols[1]:
+        if st.button("✏️ Edit"):
+            st.session_state['show_correction_form'] = True
+
+    if st.session_state.get('show_correction_form'):
+        with st.form("correction_form"):
+            st.warning("Please provide the correct analysis.")
+            corrected_flag = st.selectbox(
+                "Correct Flag:",
+                options=["Yes", "No", "Uncertain"],
+                index=["Yes", "No", "Uncertain"].index(flag) if flag in ["Yes", "No", "Uncertain"] else 0
+            )
+            corrected_reasoning = st.text_area(
+                "Correct Reasoning:"
+            )
+            
+            submitted = st.form_submit_button("Submit Correction")
+            if submitted:
+                update_feedback(
+                    st.session_state['last_analysis_id'],
+                    status='corrected',
+                    corrected_flag=corrected_flag,
+                    corrected_reasoning=corrected_reasoning
+                )
+                st.success("Thank you! Your correction has been saved.")
+                st.session_state['last_result'] = None
+                st.session_state['last_analysis_id'] = None
+                st.session_state['show_correction_form'] = False
+                # --- ADDED: Ensure instant refresh after correction ---
+                st.rerun()
+
+
+# --- Audit Log Display ---
 st.write("---")
 st.subheader("📜 Analysis History (Audit Log)")
 
@@ -154,13 +193,22 @@ with st.spinner("Loading history..."):
     log_df = fetch_all_logs()
 
     if not log_df.empty:
-        # Select the columns you want to show in the main view
         st.dataframe(
             log_df,
             use_container_width=True,
-            hide_index=True
+            hide_index=True,
+            # --- SIMPLIFIED AND CORRECTED COLUMN CONFIGURATION ---
+            column_config={
+                "timestamp": st.column_config.DatetimeColumn(
+                    "Timestamp",
+                    format="YYYY-MM-DD HH:mm:ss",
+                ),
+                "original_query": "Original Query",
+                "flag": "AI Flag",
+                "reasoning": "AI Reasoning",
+                "status": "Review Status",
+                "human_feedback": "Human Feedback" # This now points to our new column
+            }
         )
-
-
     else:
         st.info("The audit log is currently empty. Run an analysis to populate it.")
