@@ -17,3 +17,6 @@ chromadb
 
 # For the web user interface (we'll use this on Day 2)
 streamlit
+
+# For displaying audit log onto streamlit app
+pandas

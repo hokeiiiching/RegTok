@@ -6,6 +6,9 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
+# Import DB functions
+from database_utils import init_db, save_analysis
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -174,11 +177,19 @@ def check_feature(feature_description: str) -> dict:
 
 
 if __name__ == "__main__":
+
+    # Initialize DB
+    init_db()
+
     # product_feature = "The app will now include a feature to let users under 16 in Europe create a profile."
     product_feature = input("Enter a product feature description to check for compliance: ")
 
     # This is the main function you will call from your Streamlit app
     analysis_result = check_feature(product_feature)
+
+    if analysis_result:
+        save_analysis(analysis_result, product_feature)
+
 
     # Print the final, structured result
     print("\n--- Compliance Analysis Result ---")

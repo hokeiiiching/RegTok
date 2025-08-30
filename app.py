@@ -1,9 +1,10 @@
 import streamlit as st
 from compliance_checker import check_feature # Import your updated backend logic
+from database_utils import init_db, save_analysis, fetch_all_logs
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="RegTok - GeoCompliance Guardian",
+    page_title="RegTok - Automate Geo-Regulation with LLM to reduce your business overheads",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -70,7 +71,7 @@ st.markdown("""
 # --- UI Layout ---
 
 st.markdown('<h1 class="title">⚖️ RegTok</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Your Automated Geo-Compliance Guardian</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Automate Geo-Regulation to save on your business overheads</p>', unsafe_allow_html=True)
 st.write("") 
 
 # Input Area
@@ -86,12 +87,18 @@ with col2:
     check_button = st.button("Check Compliance", use_container_width=True)
 
 st.write("")
-st.write("---")
+
+# Create DB file on first run
+init_db()
+
 
 # --- Logic and Output ---
 if check_button and feature_description:
     with st.spinner('Analyzing compliance requirements... This may take a moment.'):
         result = check_feature(feature_description)
+        # Save result to DB right after getting it
+        if result:
+            save_analysis(result, feature_description)
     
     st.subheader("Analysis Result")
 
@@ -138,3 +145,34 @@ if check_button and feature_description:
 
 elif check_button and not feature_description:
     st.warning("Please enter a feature description to analyze.")
+
+# --- ADDITION: Display the Audit Log at the bottom of the page ---
+st.write("---")
+st.subheader("📜 Analysis History (Audit Log)")
+
+with st.spinner("Loading history..."):
+    log_df = fetch_all_logs()
+
+    if not log_df.empty:
+        # Make the dataframe more human-readable
+        display_df = log_df.rename(columns={
+            'timestamp': 'Date & Time',
+            'feature_description': 'Feature Description',
+            'flag': 'Flag',
+            'reasoning': 'Reasoning',
+            'related_regulations': 'Related Regulations'
+        })
+        
+        # Select the columns you want to show in the main view
+        st.dataframe(
+            display_df[['Date & Time', 'Feature Description', 'Flag', 'Reasoning', 'Related Regulations']],
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # Optionally, show the detailed 'thought_process' in an expander
+        with st.expander("Click here to see the full log with AI thought processes"):
+             st.dataframe(log_df, use_container_width=True, hide_index=True)
+
+    else:
+        st.info("The audit log is currently empty. Run an analysis to populate it.")
