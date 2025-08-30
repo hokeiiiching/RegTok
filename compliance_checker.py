@@ -100,7 +100,7 @@ def check_feature(feature_description: str) -> dict:
     # --- NEW: Self-Evolving Agent Logic ---
     # 2. Fetch "Golden Examples" from the database based on human corrections.
     print("Step 2: Fetching human-corrected examples to improve accuracy...")
-    golden_examples = fetch_corrected_examples(n_examples=2)
+    golden_examples = fetch_corrected_examples()
     
     examples_prompt_section = ""
     if golden_examples:
@@ -116,17 +116,16 @@ Here are some examples of correct analyses based on past human feedback. Use the
 """
     # 3. Augment the system prompt with the golden examples.
     system_prompt = f"""
-You are an expert compliance officer for a tech company. Your task is to analyze a product feature description and determine if it requires geo-specific compliance logic (e.g., age gates, data localization, content restrictions for a specific country or state).
-
-Analyze the provided "Product Feature" and the "Relevant Legal Texts". Based on this analysis, you must provide a structured response in JSON format.
-
-The JSON output must have three keys:
-1.  "flag": A single string. Must be one of "Yes", "No", or "Uncertain".
-2.  "reasoning": A concise, one-sentence explanation for your flag.
-3.  "related_regulations": A list of strings of specific regulation names. If none are relevant, provide an empty list [].
+You are an expert compliance officer for a tech company. Your task is to analyze a product feature description and determine if it requires geo-specific compliance logic.
 
 {examples_prompt_section}
-Now, perform the analysis for the following request.
+
+First, in your thought process, analyze the user's feature. Then, compare it to the examples provided. Explicitly state whether the user's feature is more similar to the 'Yes' or 'No' example and explain why. This comparison should directly influence your final reasoning.
+
+After your thought process, provide your final analysis as a structured JSON output with three keys:
+1.  "flag": A single string ("Yes", "No", or "Uncertain").
+2.  "reasoning": A concise, one-sentence explanation for your flag.
+3.  "related_regulations": A list of strings of specific regulation names. If none are relevant, provide an empty list [].
 """
 
     user_prompt = f"""
