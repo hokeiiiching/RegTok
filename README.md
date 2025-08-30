@@ -17,14 +17,10 @@ navigate a complex web of geographic regulations---from Brazil's data
 localization to GDPR. Manually tracking which features are impacted by
 which laws is a monumental challenge that creates significant risk:
 
-## ⚖️ Legal Exposure: Undetected compliance gaps can lead to fines and
-legal action.
+## ⚖️ Legal Exposure: Undetected compliance gaps can lead to fines and legal action.
+## 🛑 Reactive Firefighting: Scrambling for answers when auditors or regulators inquire.
 
-## 🛑 Reactive Firefighting: Scrambling for answers when auditors or
-regulators inquire.
-
-## 🚧 Manual Overhead: Scaling global feature rollouts becomes slow and
-inefficient.
+## 🚧 Manual Overhead: Scaling global feature rollouts becomes slow and inefficient.
 
 This project addresses the official TikTok TechJam 2025 problem
 statement: "Build a prototype system that utilizes LLM capabilities to
@@ -134,10 +130,6 @@ Git
 
 ### Step 1: Clone the Repository
 
-code
-
-Bash
-
 git clone https://github.com/your-username/your-repo-name.git
 
 cd your-repo-name
@@ -165,10 +157,6 @@ and Database.
 
 Create and activate a Python virtual environment:
 
-code
-
-Bash
-
 # macOS / Linux
 
 python3 -m venv venv
@@ -179,7 +167,7 @@ source venv/bin/activate
 
 python -m venv venv
 
-.`\venv`{=tex}`\Scripts`{=tex}`\activate`{=tex}
+/venv/Scripts/activate
 
 Install the required dependencies:
 
@@ -192,8 +180,11 @@ credentials:
 
 
 GOOGLE_API_KEY="your_google_api_key_here"
+
 CHROMA_API_KEY="your_chroma_api_key_here"
+
 CHROMA_TENANT="your_chroma_tenant_name"
+
 CHROMA_DATABASE="your_chroma_database_name"
 
 ### Step 5: Prepare Your Knowledge Base
@@ -207,17 +198,9 @@ each file will be used as its source citation.
 Run the ingestion script to read your knowledge base, create embeddings,
 and upload them to your ChromaDB Cloud instance.
 
-code
-
-Bash
-
 python prepare_knowledge_base.py
 
 ### Step 7: Run the Streamlit App
-
-code
-
-Bash
 
 streamlit run app.py
 
