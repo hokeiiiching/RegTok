@@ -4,8 +4,8 @@ import re
 import pandas as pd
 import chromadb
 from sentence_transformers import SentenceTransformer
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+
 from dotenv import load_dotenv
 
 from database_utils import init_db, save_analysis, fetch_corrected_examples
